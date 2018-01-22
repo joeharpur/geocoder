@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <title>Geocoder</title>
+        <link rel='stylesheet' href='static/style.css'/>
+        <link rel='stylesheet' href='static/leaflet.css'/>
+        <link href="https://fonts.googleapis.com/css?family=Play" rel="stylesheet">
+        <link href='https://api.mapbox.com/mapbox-gl-js/v0.42.0/mapbox-gl.css' rel='stylesheet' />
+		<script src='static/leaflet.js'></script>
+		<script src='https://api.mapbox.com/mapbox-gl-js/v0.42.0/mapbox-gl.js'></script>
+    </head>
+    <body>
+        <div id="container">
+            <div id="formid">
+                <a href = '/'><h1>Geocoder</h1></a>
+                <form action= "/" method="post">
+                    <input name="address" placeholder="Enter address..."/>
+                    <br><br>
+                    <input type="image" src="static/images/search.png" border="0" alt="Submit" />
+                </form>
+
+                {{ output }}
+
+            </div>
+            <div id="mapid"></div>
+            <script>
+
+                var mymap = L.map('mapid').setView([53.5, -7.698937], 7);  // Create map in div#mapid
+                var marker;
+
+                var markers_list = {{ for_mapping|default([], true) }};  // Retrieves mapping points from geocoder.py
+
+                // Mapbox map
+                var darkMap = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+                    maxZoom: 18,
+                    id: 'mapbox.dark',
+                    style: 'mapbox://styles/mapbox/dark-v9',
+                    accessToken: 'pk.eyJ1Ijoiam9laGFycHVyIiwiYSI6ImNqYzIwN2tvaDBiMDUzMHI2NjZ6dWQxZ2MifQ.BfcooXG7g3QBwENCdkwD9A'
+                });
+
+                mymap.addLayer(darkMap);  // Add map as a layer
+
+                var markerIcon = L.icon({
+                    iconUrl : "static/images/marker-icon.png",
+                    shadowUrl : "static/images/marker-shadow.png",
+                    iconSize:     [19, 40],
+                    shadowSize:   [25, 30],
+                    iconAnchor:   [11, 39],
+                    shadowAnchor: [2, 27],
+                    popupAnchor:  [-1, -41]
+
+                });  // Create markerIcon object
+
+                for (var i = 0; i < markers_list.length; i++) {
+                marker = new L.marker([markers_list[i][1],markers_list[i][0]], {icon : markerIcon})
+                    .addTo(mymap);
+                }  // For each point in the markers_list array, create a new marker instance and add to map
+
+            </script>
+        </div>
+    </body>
+</html>
